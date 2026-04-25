@@ -4,11 +4,7 @@
 KYMA가 무대 코어를 지키며 몰려오는 악성 팬을 막고, 팬심을 모아 라이브 스킬로 위기를 넘기는 팬게임 프로토타입입니다.
 
 ## 시작 링크
-
-- 로컬 개발 서버: http://127.0.0.1:5173
-- GitHub Pages 배포 후: `https://<github-username>.github.io/livedefence/`
-
-현재 원격 저장소 후보는 `HyunJaeGit/livedefence`입니다.
+https://fatking25.github.io/livedefence/
 
 ## 실행
 
