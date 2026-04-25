@@ -258,39 +258,141 @@ export function drawGame(ctx: CanvasRenderingContext2D, state: GameState) {
 }
 
 function drawMap(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = "#182235";
+  ctx.fillStyle = "#152033";
   ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-  ctx.fillStyle = "#263955";
-  for (const rect of BUILDING_RECTS) {
-    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-    ctx.strokeStyle = "#3e5878";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+  drawSidewalks(ctx);
+  drawRoads(ctx);
+  BUILDING_RECTS.forEach((rect, index) => drawBuilding(ctx, rect, index));
+  drawLandmarks(ctx);
+  drawStagePlaza(ctx);
+}
+
+function drawSidewalks(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = "#20304a";
+  ctx.fillRect(0, 0, 570, 300);
+  ctx.fillRect(670, 0, 610, 300);
+  ctx.fillRect(0, 404, 570, 316);
+  ctx.fillRect(670, 404, 610, 316);
+
+  ctx.strokeStyle = "#304766";
+  ctx.lineWidth = 1;
+  for (let x = 0; x < GAME_WIDTH; x += 48) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, GAME_HEIGHT);
+    ctx.stroke();
   }
-  ctx.fillStyle = "#22324a";
-  ctx.fillRect(0, 300, GAME_WIDTH, 95);
-  ctx.fillRect(560, 0, 90, GAME_HEIGHT);
+  for (let y = 0; y < GAME_HEIGHT; y += 48) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(GAME_WIDTH, y);
+    ctx.stroke();
+  }
+}
+
+function drawRoads(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = "#26374f";
+  ctx.fillRect(0, 300, GAME_WIDTH, 104);
+  ctx.fillRect(570, 0, 100, GAME_HEIGHT);
+
+  ctx.fillStyle = "#1d2a40";
+  ctx.fillRect(0, 323, GAME_WIDTH, 6);
+  ctx.fillRect(0, 376, GAME_WIDTH, 6);
+  ctx.fillRect(592, 0, 6, GAME_HEIGHT);
+  ctx.fillRect(642, 0, 6, GAME_HEIGHT);
+
   ctx.strokeStyle = "#f2d44a";
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 4;
+  ctx.setLineDash([34, 26]);
   ctx.beginPath();
   ctx.moveTo(0, 350);
   ctx.lineTo(GAME_WIDTH, 350);
-  ctx.moveTo(605, 0);
-  ctx.lineTo(605, GAME_HEIGHT);
+  ctx.moveTo(620, 0);
+  ctx.lineTo(620, GAME_HEIGHT);
   ctx.stroke();
-  ctx.fillStyle = "#f4f7fb";
-  for (let x = 700; x < 900; x += 28) ctx.fillRect(x, 418, 18, 62);
-  ctx.fillStyle = "#3b82f6";
-  ctx.fillRect(710, 120, 92, 34);
-  ctx.fillStyle = "#111827";
-  ctx.font = "16px sans-serif";
-  ctx.fillText("당산역 출구", 720, 143);
-  ctx.fillStyle = "#22c55e";
-  ctx.fillRect(980, 380, 120, 28);
-  ctx.fillStyle = "#e5e7eb";
-  ctx.fillText("버스정류장", 996, 400);
+  ctx.setLineDash([]);
+
   ctx.fillStyle = "#f8fafc";
-  ctx.fillText("상가 골목", 180, 225);
+  for (let x = 728; x < 944; x += 28) ctx.fillRect(x, 424, 17, 62);
+  for (let y = 184; y < 292; y += 24) ctx.fillRect(504, y, 58, 14);
+}
+
+function drawBuilding(ctx: CanvasRenderingContext2D, rect: { x: number; y: number; w: number; h: number }, index: number) {
+  const palette = ["#2b405f", "#31486a", "#263a58", "#36506f"];
+  ctx.fillStyle = palette[index % palette.length];
+  ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+  ctx.strokeStyle = "#56749b";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+
+  ctx.fillStyle = "rgba(255, 255, 255, 0.14)";
+  const cols = Math.max(2, Math.floor(rect.w / 34));
+  const rows = Math.max(1, Math.floor(rect.h / 30));
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < cols; col += 1) {
+      ctx.fillRect(rect.x + 14 + col * 30, rect.y + 13 + row * 25, 14, 9);
+    }
+  }
+
+  if (rect.w > 115) {
+    const signColors = ["#f9a8d4", "#38bdf8", "#86efac", "#fde047"];
+    ctx.fillStyle = signColors[index % signColors.length];
+    ctx.fillRect(rect.x + 12, rect.y + rect.h - 24, Math.min(88, rect.w - 24), 16);
+  }
+}
+
+function drawLandmarks(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = "#3b82f6";
+  ctx.fillRect(774, 126, 94, 36);
+  ctx.fillStyle = "#082f49";
+  ctx.font = "bold 15px sans-serif";
+  ctx.fillText("당산역 출구", 784, 149);
+
+  ctx.fillStyle = "#22c55e";
+  ctx.fillRect(1046, 386, 120, 28);
+  ctx.fillStyle = "#ecfdf5";
+  ctx.font = "bold 16px sans-serif";
+  ctx.fillText("버스정류장", 1060, 406);
+
+  ctx.fillStyle = "#f9a8d4";
+  ctx.fillRect(110, 268, 120, 24);
+  ctx.fillStyle = "#4a044e";
+  ctx.fillText("상가 골목", 136, 286);
+
+  ctx.fillStyle = "#7dd3fc";
+  for (const lamp of [
+    { x: 532, y: 138 },
+    { x: 424, y: 212 },
+    { x: 1168, y: 378 },
+    { x: 732, y: 548 },
+    { x: 1268, y: 224 }
+  ]) {
+    ctx.beginPath();
+    ctx.arc(lamp.x, lamp.y, 7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawStagePlaza(ctx: CanvasRenderingContext2D) {
+  ctx.save();
+  ctx.fillStyle = "rgba(236, 72, 153, 0.14)";
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(GAME_WIDTH / 2, GAME_HEIGHT / 2, 82, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#f9a8d4";
+  for (let i = 0; i < 8; i += 1) {
+    const angle = (Math.PI * 2 * i) / 8;
+    const x = GAME_WIDTH / 2 + Math.cos(angle) * 68;
+    const y = GAME_HEIGHT / 2 + Math.sin(angle) * 68;
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 function drawCore(ctx: CanvasRenderingContext2D, state: GameState) {
